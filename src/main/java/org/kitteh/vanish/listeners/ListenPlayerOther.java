@@ -22,24 +22,21 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
-import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.EntityBlockFormEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
-import org.bukkit.event.raid.RaidTriggerEvent;
 import org.bukkit.inventory.Inventory;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.kitteh.vanish.Settings;
@@ -101,9 +98,6 @@ public final class ListenPlayerOther implements Listener {
                     inventory = player.getEnderChest();
                     break;
             }
-            if (inventory == null && blockState instanceof Container) {
-                inventory = ((Container) blockState).getInventory();
-            }
             if (inventory != null) {
                 event.setCancelled(true);
                 if (fake) {
@@ -116,27 +110,11 @@ public final class ListenPlayerOther implements Listener {
         }
         if (this.plugin.getManager().isVanished(player) && VanishPerms.canNotInteract(player)) {
             event.setCancelled(true);
-            return;
-        }
-        if ((event.getAction() == Action.PHYSICAL) && (event.getClickedBlock() != null) && (event.getClickedBlock().getType() == Material.FARMLAND)) {
-            if (this.plugin.getManager().isVanished(player) && VanishPerms.canNotTrample(player)) {
-                event.setCancelled(true);
-            }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerPickupItem(@NonNull EntityPickupItemEvent event) {
-        if (!(event.getEntity() instanceof Player)) {
-            return;
-        }
-        if (this.plugin.getManager().isVanished((Player) event.getEntity()) && VanishPerms.canNotPickUp((Player) event.getEntity())) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPickupArrow(@NonNull PlayerPickupArrowEvent event) {
+    public void onPlayerPickupItem(@NonNull PlayerPickupItemEvent event) {
         if (this.plugin.getManager().isVanished(event.getPlayer()) && VanishPerms.canNotPickUp(event.getPlayer())) {
             event.setCancelled(true);
         }
@@ -175,13 +153,6 @@ public final class ListenPlayerOther implements Listener {
     public void onWorldChange(@NonNull PlayerChangedWorldEvent event) {
         if (Settings.getWorldChangeCheck()) {
             this.plugin.getManager().playerRefresh(event.getPlayer());
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onRaidTrigger(@NonNull RaidTriggerEvent event) {
-        if (this.plugin.getManager().isVanished(event.getPlayer())) {
-            event.setCancelled(true);
         }
     }
 
