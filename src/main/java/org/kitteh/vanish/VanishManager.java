@@ -101,13 +101,6 @@ public final class VanishManager {
 
         this.showPlayer = new ShowPlayerHandler(this.plugin);
         this.plugin.getServer().getScheduler().scheduleSyncRepeatingTask(this.plugin, this.showPlayer, 4, 4);
-
-        this.plugin.getServer().getMessenger().registerIncomingPluginChannel(this.plugin, VanishManager.VANISH_PLUGIN_CHANNEL, (channel, player, message) -> {
-            if (channel.equals(VanishManager.VANISH_PLUGIN_CHANNEL) && new String(message).equals("check")) {
-                player.sendPluginMessage(plugin, VanishManager.VANISH_PLUGIN_CHANNEL, VanishManager.this.isVanished(player) ? new byte[]{0x01} : new byte[]{0x00});
-            }
-        });
-        this.plugin.getServer().getMessenger().registerOutgoingPluginChannel(this.plugin, VanishManager.VANISH_PLUGIN_CHANNEL);
     }
 
     /**
@@ -295,7 +288,6 @@ public final class VanishManager {
             }
         }
         this.plugin.getServer().getPluginManager().callEvent(new VanishStatusChangeEvent(vanishingPlayer, vanishing));
-        vanishingPlayer.sendPluginMessage(this.plugin, VanishManager.VANISH_PLUGIN_CHANNEL, vanishing ? new byte[]{0x01} : new byte[]{0x00});
         final java.util.Collection<? extends Player> playerList = this.plugin.getServer().getOnlinePlayers();
         for (final Player otherPlayer : playerList) {
             if (vanishingPlayer.equals(otherPlayer)) {
